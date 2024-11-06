@@ -1,0 +1,58 @@
+/* Estilos generales */
+
+/* .folder-card, .file-card {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+} */
+
+/* .folder-card:hover, .file-card:hover {
+  transform: scale(1.05);
+} */
+
+.dropdown-toggle::after {
+  display: none;  /* Esto oculta la flecha del dropdown */
+}
+
+.dropdown-toggle:hover {
+  background-color: gray;
+  border-radius: 30px;
+}
+
+.folder-icon, .file-icon {
+  font-size: 50px;
+  color: #007bff;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.folder-card {
+  background-color: #f0f8ff;
+}
+
+.file-card {
+  background-color: #f8f9fa;
+}
+
+.actions button {
+  font-size: 14px;
+}
+
+.modal .modal-body {
+  padding: 20px;
+}
+
+.modal .form-control {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+}

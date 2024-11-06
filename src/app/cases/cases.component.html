@@ -1,0 +1,57 @@
+<div class="container mt-4">
+  <h2 class="mb-3">Gestión de Casos</h2>
+
+  <!-- Botón para agregar un nuevo caso -->
+  <button class="btn btn-primary mb-3" (click)="openAddCaseModal()">Agregar Caso</button>
+
+  <!-- Tabla de Casos -->
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Descripción</th>
+        <th>Fecha de Creación</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let caseItem of cases">
+        <td>{{ caseItem.title }}</td>
+        <td>{{ caseItem.description }}</td>
+        <td>{{ caseItem.createdAt | date: 'short' }}</td>
+        <td>
+          <button class="btn btn-info btn-sm me-1" (click)="openEditCaseModal(caseItem)">Editar</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteCase(caseItem.id)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Modal para agregar/editar caso -->
+  <div class="modal" tabindex="-1" [ngClass]="{'show d-block': isModalOpen}">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ isEditing ? 'Editar Caso' : 'Agregar Caso' }}</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="caseForm">
+            <div class="mb-3">
+              <label for="title" class="form-label">Título</label>
+              <input type="text" id="title" formControlName="title" class="form-control" />
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Descripción</label>
+              <textarea id="description" formControlName="description" class="form-control"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+          <button type="button" class="btn btn-primary" (click)="saveCase()">{{ isEditing ? 'Actualizar' : 'Guardar' }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
