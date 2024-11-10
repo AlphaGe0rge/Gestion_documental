@@ -8,13 +8,13 @@
         <!-- Formulario -->
         <form [formGroup]="authForm">
           <div class="form-group mb-3">
-            <label for="email" class="form-label">Correo Electrónico</label>
+            <label for="userName" class="form-label">Usuario</label>
             <input 
-              type="email" 
+              type="text" 
               class="form-control" 
-              id="email" 
-              placeholder="Ingresa tu correo electrónico" 
-              formControlName="email">
+              id="userName" 
+              placeholder="Ingresa tu Usuario" 
+              formControlName="userName">
           </div>
           
           <div class="form-group mb-3">
@@ -29,7 +29,7 @@
           
           <!-- Error de validación -->
           <div *ngIf="formInvalid" class="alert alert-danger text-center mt-3">
-            Correo o Contraseña Incorrectos.
+            Usuario o Contraseña Incorrectos.
           </div>
           
           <!-- Botón de inicio de sesión -->

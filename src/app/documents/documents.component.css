@@ -1,58 +1,136 @@
-/* Estilos generales */
-
-/* .folder-card, .file-card {
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out;
-} */
-
-/* .folder-card:hover, .file-card:hover {
-  transform: scale(1.05);
-} */
-
-.dropdown-toggle::after {
-  display: none;  /* Esto oculta la flecha del dropdown */
+/* Estilos Generales */
+.container {
+  margin-top: 2rem;
 }
 
-.dropdown-toggle:hover {
-  background-color: gray;
-  border-radius: 30px;
-}
-
-.folder-icon, .file-icon {
-  font-size: 50px;
-  color: #007bff;
-}
-
-.card-title {
-  font-size: 14px;
+.text-center {
   font-weight: bold;
-}
-
-.card-body {
-  padding: 20px;
-}
-
-.folder-card {
-  background-color: #f0f8ff;
-}
-
-.file-card {
-  background-color: #f8f9fa;
 }
 
 .actions button {
   font-size: 14px;
 }
 
+/* Estilos para Botones */
+.btn-primary {
+  background-color: #4a90e2;
+  border: none;
+}
+.btn-primary:hover {
+  background-color: #357abd;
+}
+.btn-success {
+  background-color: #5cb85c;
+  border: none;
+}
+.btn-success:hover {
+  background-color: #449d44;
+}
+.btn-secondary {
+  background-color: #6c757d;
+  border: none;
+}
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  background-color: transparent;
+  font-size: 14px;
+}
+.breadcrumb-item.active {
+  color: #6c757d;
+}
+
+/* Modal */
 .modal .modal-body {
   padding: 20px;
 }
-
 .modal .form-control {
   width: 100%;
 }
 
-.actions {
-  display: flex;
-  justify-content: space-between;
+/* Acordeón y Títulos */
+.card-header {
+  background-color: transparent;
+  border: none;
+  padding: 0.5rem 1rem;
+}
+.btn-link {
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+  width: 100%;
+  text-align: left;
+}
+.btn-link:hover {
+  text-decoration: none;
+  color: #333;
+}
+.btn-link:focus {
+  box-shadow: none;
+}
+.card-header .btn-link::after {
+  content: '▼';
+  font-size: 1.2em;
+  float: right;
+  transition: transform 0.3s ease;
+}
+.card-header .btn-link[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+/* Estilos para Cards de Carpetas y Archivos */
+/* .folder-card, .file-card {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+  border: none;
+}
+.folder-card:hover, .file-card:hover {
+  transform: scale(1.05);
+} */
+.folder-icon, .file-icon {
+  font-size: 50px;
+  color: #007bff;
+}
+.folder-card {
+  background-color: #f0f8ff;
+}
+.file-card {
+  background-color: #f8f9fa;
+}
+.card-title {
+  font-size: 14px;
+  font-weight: bold;
+}
+.card-body {
+  padding: 20px;
+  position: relative;
+}
+
+/* Dropdown en la Esquina Superior Derecha */
+.dropdown-toggle::after {
+  display: none; /* Oculta la flecha del dropdown */
+}
+.dropdown-toggle:hover {
+  background-color: gray;
+  border-radius: 30px;
+}
+.dropdown.position-absolute {
+  top: 10px;
+  right: 10px;
+}
+
+/* Área de Documentos y Carpetas Vacías */
+.document-area .d-flex {
+  color: #6c757d;
+  font-weight: bold;
+}
+
+/* Estilos para la Vista Previa del Archivo */
+iframe {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
 }

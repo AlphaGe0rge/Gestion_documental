@@ -23,9 +23,9 @@ export class DocumentsService {
 
   constructor(private http: HttpClient) {}
 
-  getRootContents(): Observable<{ folders: Folder[]; files: Document[] }> {
+  getRootContents(caseId: any): Observable<{ folders: Folder[]; files: Document[] }> {
     return this.http.get<{ folders: Folder[]; files: Document[] }>(
-      `${this.apiUrl}/root`
+      `${this.apiUrl}/root/${caseId}`
     );
   }
 

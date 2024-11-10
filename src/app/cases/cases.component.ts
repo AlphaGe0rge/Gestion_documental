@@ -34,10 +34,54 @@ export class CasesComponent implements OnInit {
   }
 
   loadCases(): void {
-    this.caseService.getAllCases().subscribe(
-      (data) => this.cases = data,
-      (error) => console.error('Error al cargar los casos', error)
-    );
+    // this.caseService.getAllCases().subscribe(
+    //   (data) => this.cases = data,
+    //   (error) => console.error('Error al cargar los casos', error)
+    // );
+    this.cases = [
+      {
+          caseId: "70fea6bd-f2c6-4fee-a030-883d5b7c147c",
+          title: "caso 2",
+          description: "prueba caso 2",
+          userId: "54992aea-ed7c-4c3c-9e19-88ac61e16aef",
+          status: true,
+          createdAt: "2024-11-10T13:45:02.000Z",
+          updatedAt: "2024-11-10T13:45:02.000Z",
+          Documents: []
+      },
+      {
+          caseId: "dc1ff08f-e4a2-4efd-9453-8de1c45e8077",
+          title: "caso 3",
+          description: "prueba caso 3",
+          userId: "54992aea-ed7c-4c3c-9e19-88ac61e16aef",
+          status: true,
+          createdAt: "2024-11-10T13:45:24.000Z",
+          updatedAt: "2024-11-10T13:45:24.000Z",
+          Documents: []
+      },
+      {          
+          caseId: "e27b1e5f-a785-4cd3-9256-08e318d76804",
+          title: "caso 1",
+          description: "pruebas caso 1",
+          userId: "54992aea-ed7c-4c3c-9e19-88ac61e16aef",
+          status: true,
+          createdAt: "2024-11-10T13:43:53.000Z",
+          updatedAt: "2024-11-10T13:43:53.000Z",
+          Documents: [
+              {
+                  documentId: "9326c9a2-43f9-4ac2-8e4e-d04b23e01289",
+                  name: "foto perfil",
+                  filePath: "perfil-1731247418114.avif",
+                  fileType: "avif",
+                  uploadedAt: "2024-11-10T14:03:38.000Z",
+                  folderId: "a905fa8c-e411-4e8f-91a1-b458e8da3cdb",
+                  caseId: "e27b1e5f-a785-4cd3-9256-08e318d76804",
+                  createdAt: "2024-11-10T14:03:38.000Z",
+                  updatedAt: "2024-11-10T14:03:38.000Z"
+              }
+          ]
+      }
+  ]
   }
 
   openAddCaseModal(): void {

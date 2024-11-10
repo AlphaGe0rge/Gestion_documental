@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DocumentsService } from '../services/documents.service';
 import { CasesService } from '../services/cases.service';
 
+import { saveAs } from 'file-saver'; // Importar correctamente la librería
+
 @Component({
   selector: 'app-documents',
   templateUrl: './documents.component.html',
@@ -35,28 +37,105 @@ export class DocumentsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadRootFolder();
     this.loadCases();
   }
 
   loadCases(): void {
-    this.casesService.getAllCases().subscribe(
-      (data) => this.cases = data,
-      (error) => console.error('Error al cargar los casos', error)
-    );
+    // this.casesService.getAllCases().subscribe(
+    //   (data) => this.cases = data,
+    //   (error) => console.error('Error al cargar los casos', error)
+    // );
+
+    this.cases = [
+      {          
+        caseId: "e27b1e5f-a785-4cd3-9256-08e318d76804",
+        title: "caso 1",
+        description: "pruebas caso 1",
+        userId: "54992aea-ed7c-4c3c-9e19-88ac61e16aef",
+        status: true,
+        createdAt: "2024-11-10T13:43:53.000Z",
+        updatedAt: "2024-11-10T13:43:53.000Z",
+        Documents: [
+            {
+                documentId: "9326c9a2-43f9-4ac2-8e4e-d04b23e01289",
+                name: "foto perfil",
+                filePath: "perfil-1731247418114.avif",
+                fileType: "avif",
+                uploadedAt: "2024-11-10T14:03:38.000Z",
+                folderId: "a905fa8c-e411-4e8f-91a1-b458e8da3cdb",
+                caseId: "e27b1e5f-a785-4cd3-9256-08e318d76804",
+                createdAt: "2024-11-10T14:03:38.000Z",
+                updatedAt: "2024-11-10T14:03:38.000Z"
+            }
+        ]
+      },
+      {
+          caseId: "70fea6bd-f2c6-4fee-a030-883d5b7c147c",
+          title: "caso 2",
+          description: "prueba caso 2",
+          userId: "54992aea-ed7c-4c3c-9e19-88ac61e16aef",
+          status: true,
+          createdAt: "2024-11-10T13:45:02.000Z",
+          updatedAt: "2024-11-10T13:45:02.000Z",
+          Documents: []
+      },
+      {
+          caseId: "dc1ff08f-e4a2-4efd-9453-8de1c45e8077",
+          title: "caso 3",
+          description: "prueba caso 3",
+          userId: "54992aea-ed7c-4c3c-9e19-88ac61e16aef",
+          status: true,
+          createdAt: "2024-11-10T13:45:24.000Z",
+          updatedAt: "2024-11-10T13:45:24.000Z",
+          Documents: []
+      }
+  ]
+
   }
 
-  loadRootFolder(): void {
-    this.documentService.getRootContents().subscribe(
-      (data) => {
-        this.currentFolders = data.folders;
-        this.currentFiles = data.files;
-      },
-      (error) => console.error('Error al cargar la carpeta raíz', error)
-    );
+  loadRootFolder(caseId: any) {
+
+    return new Promise((resolve, reject) => {
+
+      this.documentService.getRootContents(caseId).subscribe(
+
+        (data) => {
+          this.currentFolders = data.folders;
+          this.currentFiles = data.files;
+          resolve('ok');
+        },
+
+        (error) => {
+          console.error('Error al cargar la carpeta raíz', error);
+          reject()
+        }
+  
+      );
+
+    }) 
+
+  }
+
+  async handleCollapseClick(item: any, event:any){
+
+    this.currentFolders = [];
+
+    const target = event.target as HTMLElement;
+    const isExpanding = target.getAttribute('aria-expanded') === 'true'; // Chequea si está expandido o no
+  
+    // Aquí estamos revisando si el acordeón se expande o colapsa
+    if (isExpanding) {
+      await this.loadRootFolder(item.caseId);
+    } else {
+      this.currentFolders = [];
+    }
+
+    item.isOpen = !item.isOpen;
+
   }
 
   createFolder(): void {
+
     if (this.folderForm.invalid) return;
 
     const folderName = this.folderForm.get('folderName')?.value;
@@ -73,6 +152,7 @@ export class DocumentsComponent implements OnInit {
   }
 
   navigateToFolder(folder: any): void {
+    
     if (!this.folderPath.find(o => o.folderId === folder.folderId)) {
       this.folderPath.push(folder);
     }
@@ -84,17 +164,21 @@ export class DocumentsComponent implements OnInit {
       },
       error: (error) => console.error('Error al cargar la carpeta', error)
     });
+
   }
 
   goBack(): void {
+
     this.folderPath.pop();
 
     const parentFolder = this.folderPath.length > 0 ? this.folderPath[this.folderPath.length - 1] : null;
 
     if (parentFolder) {
       this.navigateToFolder(parentFolder);
-    } else {
-      this.loadRootFolder();
+    } 
+    else {
+      this.cases.map(o => o.isOpen = false);
+      this.currentFiles = [];
     }
   }
 
@@ -165,9 +249,9 @@ downloadFile(file: any) {
 
   console.log(file); // Verificar que el archivo esté correctamente recibido
   this.documentService.downloadDocument(file.documentId).subscribe((response) => {
-    // Aquí puedes manejar la respuesta, por ejemplo, si necesitas mostrar algo
+    saveAs(response, file.name);
   }, error => {
-    console.error("Error al intentar descargar el archivo:", error);
+    console.log(error)
   });
 
 }

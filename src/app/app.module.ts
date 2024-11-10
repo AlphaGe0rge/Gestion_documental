@@ -10,8 +10,10 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { CasesComponent } from './cases/cases.component';
 import { DocumentsComponent } from './documents/documents.component';
 import { UserSettingsComponent } from './user-settings/user-settings.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SafeUrlPipe } from './pipes/safeUrl';
+import { DataGridComponent } from './widgets/data-grid/data-grid.component';
+import { UsersComponent } from './users/users.component';
 
 @NgModule({
   declarations: [
@@ -21,13 +23,16 @@ import { SafeUrlPipe } from './pipes/safeUrl';
     CasesComponent,
     DocumentsComponent,
     UserSettingsComponent,
+    DataGridComponent,
+    UsersComponent,
     SafeUrlPipe
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

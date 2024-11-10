@@ -1,0 +1,44 @@
+.table {
+    width: 100%;
+    max-width: 100%;
+}
+
+.pagination {
+    margin-top: 10px;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.mb-2 {
+    margin-bottom: 1rem;
+}
+
+.modal-content {
+    max-width: 500px;
+    margin: auto;
+}
+
+.table-responsive {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.text-center {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+  }
+
+  tfoot {
+    background-color: #f1f1f1;
+  }
+  
+  tfoot td {
+    font-weight: bold;
+  }

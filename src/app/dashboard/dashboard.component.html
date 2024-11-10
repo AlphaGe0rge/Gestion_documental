@@ -1,22 +1,37 @@
 <div class="d-flex vh-100">
   <!-- Sidebar -->
-  <div class="bg-dark text-white p-3" style="width: 250px;">
-    <h4>Gestión Documental</h4>
-    <ul class="nav flex-column mt-4">
-      <li class="nav-item">
-        <a class="nav-link text-white" [routerLink]="['/dashboard/cases']" routerLinkActive="active-link">Casos</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-white" [routerLink]="['/dashboard/documents']" routerLinkActive="active-link">Documentos</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-white" [routerLink]="['/dashboard/user-settings']" routerLinkActive="active-link">Configuración</a>
-      </li>
-    </ul>
+  <div class="bg-dark text-white p-3 row" style="width: 250px;">
+    <div>
+
+      <h4>Gestión Documental</h4>
+      <ul class="nav flex-column mt-4">
+        <li class="nav-item">
+          <a class="nav-link text-white" [routerLink]="['/dashboard/cases']" routerLinkActive="active-link">Casos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" [routerLink]="['/dashboard/documents']" routerLinkActive="active-link">Documentos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" [routerLink]="['/dashboard/users']" routerLinkActive="active-link">Usuarios</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" [routerLink]="['/dashboard/user-settings']" routerLinkActive="active-link">Configuración</a>
+        </li>
+      </ul>
+
+    </div>
+
+    <div class="align-self-end">
+      <button class="btn btn-light" (click)="logout()">
+        <i class="bi bi-box-arrow-left"></i> Logout
+      </button>
+    </div>
+
   </div>
 
   <!-- Main Content -->
   <div class="p-4 flex-grow-1">
     <router-outlet></router-outlet> <!-- Aquí se cargará el componente seleccionado -->
   </div>
+
 </div>

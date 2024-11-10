@@ -1,0 +1,121 @@
+<!-- Contenedor del Header para los botones -->
+<div class="header-container">
+    <button type="button" class="btn btn-primary" (click)="getDataGrid()">
+        <i class="bi bi-arrow-repeat"></i> Buscar
+    </button>
+    <button type="button" class="btn btn-primary" (click)="openUserModal()">
+        <i class="bi bi-plus-circle"></i> Agregar
+    </button>
+</div>
+
+<!-- Filtros -->
+<div class="container">
+    <form class="row g-3 align-items-end filters-container">
+        
+        <div class="col-md-3">
+          <label for="rol" class="form-label">Rol</label>
+          <select id="rol" class="form-control" [(ngModel)]="filters.roleId" name="rol" (change)="changeRol()">
+            <option *ngFor="let rol of roles" [value]="rol.id">{{rol.name}}</option>
+          </select>
+        </div>
+  
+        <div class="col-md-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input
+            type="text"
+            id="nombre"
+            [(ngModel)]="filters.nombre"
+            name="nombreFilter"
+            class="form-control"
+            placeholder="Enter nombre"
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label for="usuario" class="form-label">Usuario</label>
+          <input
+            type="text"
+            id="usuario"
+            [(ngModel)]="filters.usuario"
+            name="usuarioFilter"
+            class="form-control"
+            placeholder="Enter usuario"
+          />
+        </div>
+  
+        <div class="col-md-3">
+          <label for="status" class="form-label">Status</label>
+          <select id="status" class="form-control" [(ngModel)]="filters.status" name="status">
+            <option *ngFor="let statu of status" [value]="statu.value">{{statu.name}}</option>
+          </select>
+        </div>
+  
+    </form>
+</div>
+  
+<!-- Contenedor del Datatable -->
+<div class="table-container mt-4">
+    <app-data-grid #dataGrid
+                   [columns]="gridColumns"
+                   [data]="filteredData"
+    ></app-data-grid>
+</div>
+  
+
+<div class="modal" tabindex="-1" [ngClass]="{'show d-block': isOpenModal}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nuevo usuario</h5>
+        <button type="button" class="btn-close" (click)="closeFileUpload()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="userForm">
+          <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="form-group mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label for="fullName">Nombre</label>
+                        <small class="text-danger" *ngIf="formInvalid('fullName')">{{getErrorMessage('fullName')}}</small>
+                    </div>
+                    <input type="text" class="form-control" id="fullName" formControlName="fullName" name="fullName" placeholder="Ingresa el nombre">
+                </div>
+
+                <div class="form-group mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label for="userName">Usuario</label>
+                        <small class="text-danger" *ngIf="formInvalid('userName')">{{getErrorMessage('userName')}}</small>
+                    </div>
+                    <input type="text" class="form-control" id="userName" formControlName="userName" placeholder="Ingresa el usuario">
+                </div>
+
+                <div class="form-group mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label for="password">Contraseña</label>
+                        <small class="text-danger" *ngIf="formInvalid('password')">{{getErrorMessage('password')}}</small>
+                    </div>
+                    <input type="password" class="form-control" id="password" formControlName="password" placeholder="Ingresa la contraseña">
+                </div>
+
+                <div class="form-group mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label for="studentPhone">Rol</label>
+                        <small class="text-danger" *ngIf="formInvalid('roleId')">{{getErrorMessage('roleId')}}</small>
+                    </div>
+                    <select class="form-control">
+                      <option>Admin</option>
+                      <option>Abogado</option>
+                    </select>
+                </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeFileUpload()">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="saveUser()" [disabled]="userForm.invalid">Agregar Usuario</button>
+      </div>
+    </div>
+  </div>
+</div>
