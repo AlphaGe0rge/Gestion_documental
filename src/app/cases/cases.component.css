@@ -1,0 +1,4 @@
+.filters-container {
+    max-width: 90%; /* Para que no ocupe toda la pantalla */
+    margin: 0 auto;
+}

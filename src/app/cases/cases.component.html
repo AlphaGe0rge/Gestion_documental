@@ -1,57 +1,107 @@
 <div class="container mt-4">
-  <h2 class="mb-3">Gestión de Casos</h2>
 
-  <!-- Botón para agregar un nuevo caso -->
-  <button class="btn btn-primary mb-3" (click)="openAddCaseModal()">Agregar Caso</button>
-
-  <!-- Tabla de Casos -->
-  <table class="table table-bordered table-striped">
-    <thead>
-      <tr>
-        <th>Título</th>
-        <th>Descripción</th>
-        <th>Fecha de Creación</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let caseItem of cases">
-        <td>{{ caseItem.title }}</td>
-        <td>{{ caseItem.description }}</td>
-        <td>{{ caseItem.createdAt | date: 'short' }}</td>
-        <td>
-          <button class="btn btn-info btn-sm me-1" (click)="openEditCaseModal(caseItem)">Editar</button>
-          <button class="btn btn-danger btn-sm" (click)="deleteCase(caseItem.id)">Eliminar</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- Modal para agregar/editar caso -->
-  <div class="modal" tabindex="-1" [ngClass]="{'show d-block': isModalOpen}">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">{{ isEditing ? 'Editar Caso' : 'Agregar Caso' }}</h5>
-          <button type="button" class="btn-close" (click)="closeModal()"></button>
-        </div>
-        <div class="modal-body">
-          <form [formGroup]="caseForm">
-            <div class="mb-3">
-              <label for="title" class="form-label">Título</label>
-              <input type="text" id="title" formControlName="title" class="form-control" />
-            </div>
-            <div class="mb-3">
-              <label for="description" class="form-label">Descripción</label>
-              <textarea id="description" formControlName="description" class="form-control"></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
-          <button type="button" class="btn btn-primary" (click)="saveCase()">{{ isEditing ? 'Actualizar' : 'Guardar' }}</button>
-        </div>
-      </div>
-    </div>
+  <div class="header-container justify-content-between">
+    <h2 class="mb-3">Gestión de Casos</h2>
+    <button class="btn btn-primary mb-3" (click)="openAddCaseModal()">Agregar Caso</button>
   </div>
-</div>
+
+    <!-- Filtros -->
+  <div>
+    <form class="row g-3 align-items-end filters-container">
+        
+        <div class="col-md-3">
+          <label for="nombre" class="form-label">Title</label>
+          <input
+            type="text"
+            id="nombre"
+            [(ngModel)]="filters.title"
+            name="nombreFilter"
+            class="form-control"
+            placeholder="Enter nombre"
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label for="dueDate">Fecha de creación</label>
+          <input type="date" id="dueDate" class="form-control" [(ngModel)]="filters.date" name="dateRange">
+        </div>
+  
+        <!-- <div class="col-md-3">
+          <label for="usuario" class="form-label">Usuario</label>
+          <input
+            type="text"
+            id="usuario"
+            [(ngModel)]="filters.usuario"
+            name="usuarioFilter"
+            class="form-control"
+            placeholder="Enter usuario"
+          />
+        </div> -->
+  
+        <div class="col-md-3">
+          <label for="status" class="form-label">Status</label>
+          <select id="status" class="form-control" [(ngModel)]="filters.status" name="status">
+            <option *ngFor="let statu of status" [value]="statu.value">{{statu.name}}</option>
+          </select>
+        </div>
+  
+    </form>
+  </div>
+
+  <div class="table-container mt-4">
+    <app-data-grid #dataGrid
+                   [columns]="gridColumns"
+                   [data]="cases"
+                   [showEdit]="true"
+                   [showDelete]="true"
+                   (editEvent)="editRow($event)"
+                   (deleteEvent)="deleteCase($event.caseId)"
+    ></app-data-grid>
+  </div>
+
+  <app-modal #caseModal
+    [modalTitle]="'Crear Caso'" 
+    [modalSize]="'medium'" 
+    [modalId]="'create'"
+    (modalClose)="closeModal()"
+    (confirm)="saveCase()">
+  
+    <div modal-header>
+      <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+    </div>
+  
+    <div modal-body>
+      <form [formGroup]="caseForm">
+        <div class="mb-3">
+          <label for="title" class="form-label">Título</label>
+          <input type="text" id="title" formControlName="title" class="form-control" />
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label">Descripción</label>
+          <textarea id="description" formControlName="description" class="form-control"></textarea>
+        </div>
+      </form>
+    </div>
+  </app-modal>
+
+<app-modal #confirmModal
+    [modalTitle]="'Confirmar Eliminación'" 
+    [modalSize]="'medium'" 
+    [modalId]="'confirmDelete'"
+    [showConfirm]="false"
+    (confirm)="caseDelete()">
+
+    <div modal-header>
+      <button type="button" class="btn-close" (click)="confirmModal.closeModal()" aria-label="Close"></button>
+    </div>
+
+    <div modal-body>
+      
+      <div class="modal-message m-b-5">
+        ¿quieres eliminar este caso?
+      </div>
+
+    </div>
+
+</app-modal>
+

@@ -1,0 +1,25 @@
+<div class="modal fade" tabindex="-1" 
+     [ngClass]="modalSize" 
+     [id]="modalId" 
+     [attr.aria-hidden]="!isOpen" 
+     [attr.inert]="!isOpen ? '' : null">
+  <div class="modal-dialog" [ngClass]="{'modal-lg': modalSize === 'large', 'modal-sm': modalSize === 'small' , 'modal-md': modalSize === 'medium'}">
+      <div class="modal-content">
+          <div class="modal-header d-flex justify-content-between">
+              <h5 class="modal-title">{{ modalTitle }}</h5>
+              <ng-content select="[modal-header]"></ng-content>
+          </div>
+          <div class="modal-body">
+              <ng-content select="[modal-body]"></ng-content>
+          </div>
+          <div class="modal-footer">
+              <ng-content select="[modal-footer]"></ng-content>
+              <div *ngIf="!hasCustomFooter">
+                  <button type="button" class="btn btn-secondary" style="margin-right: 5px;" (click)="closeModal()">Cerrar</button>
+                  <button *ngIf="showCloseConfirm" type="button" style="margin-right: 5px;" class="btn btn-primary mr-2" (click)="confirmModal(true)">Cerrar y Confirmar</button>
+                  <button *ngIf="showConfirm" type="button" class="btn btn-primary" (click)="confirmModal(false)">Confirmar</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>

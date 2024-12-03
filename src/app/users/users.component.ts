@@ -1,6 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DataGridComponent } from 'src/app/widgets/data-grid/data-grid.component';
+import { UserService } from '../services/user.service';
+import { ModalComponent } from '../widgets/modal/modal.component';
+import { UserValidatorService } from '../validators/user-validator.service';
 @Component({
   selector: 'app-add-users',
   templateUrl: './users.component.html',
@@ -9,7 +12,7 @@ import { DataGridComponent } from 'src/app/widgets/data-grid/data-grid.component
 export class UsersComponent implements OnInit {
   
  @ViewChild('dataGrid', { static: false }) dataGrid: DataGridComponent;
-
+ @ViewChild('userModal', { static: false }) userModal!: ModalComponent;
 
   filters = {
     roleId: 'student',
@@ -20,8 +23,6 @@ export class UsersComponent implements OnInit {
     gradeId: '',
     status: null
   };
-
-  isOpenModal = false;
 
   status = [
       {
@@ -40,11 +41,7 @@ export class UsersComponent implements OnInit {
 
   userId = "";
 
-  filteredData: any[] = [
-    {fullName: "Jorge Amaya", userName: "jamaya", phone: "3125047189", rol: "Admin"},
-    {fullName: "Jorge Ortega", userName: "jortega", phone: "3125047189", rol: "Abogado"},
-    {fullName: "Fabian Fonnegra", userName: "fanegra", phone: "3125047189", rol: "Abogado"},
-  ];
+  filteredData: any[] = [];
 
   periods: any[] = [];
   grades: any[] = []
@@ -65,7 +62,9 @@ export class UsersComponent implements OnInit {
   ]
 
   constructor(private changeDetectorRef:ChangeDetectorRef,
-              private fb: FormBuilder
+              private fb: FormBuilder,
+              private userService: UserService,
+              private userValidator: UserValidatorService
   ) { 
     this.dataGrid = new DataGridComponent();
   }
@@ -74,7 +73,7 @@ export class UsersComponent implements OnInit {
 
     this.userForm = this.fb.group({
       fullName: ['', Validators.required],
-      userName: ['', Validators.required],
+      userName: ['', Validators.required, [this.userValidator]],
       password: ['', Validators.required],
       roleId: ['', Validators.required]
     });
@@ -88,39 +87,66 @@ export class UsersComponent implements OnInit {
     this.gridColumns = [
       { name: 'Nombre', field: 'fullName', editable: false, show: true },
       { name: 'Usuario', field: 'userName', editable: false, show: true},
-      { name: 'Celular', field: 'phone', editable: false, show: true},
-      { name: 'Rol', field: 'rol', editable: false, show: true },
+      { name: 'Rol', field: 'role', editable: false, show: true },
     ]
 
   }
 
-  getDataGrid(){
-    this.filteredData = [
-      {fullName: "Jorge Amaya", userName: "jamaya", rol: "Admin"},
-      {fullName: "Jorge Ortega", userName: "jortega", rol: "Abogado"},
-      {fullName: "Fabian Fonnegra", userName: "fanegra", rol: "Abogado"},
-    ]
+  getDataGrid() {
 
-    this.changeDetectorRef.detectChanges();
+    let where: any = {};
+
+    if (this.filters.nombre) where.fullName = this.filters.nombre;
+    if (this.filters.usuario) where.userName = this.filters.usuario;
+    if (this.filters.roleId) where.role = this.filters.roleId;
+    if (this.filters.status) where.status = this.filters.status;
+
+    this.userService.getAllUsers(where).subscribe({
+      next: (data) => {
+          this.filteredData = data;
+          this.changeDetectorRef.detectChanges();
+          this.dataGrid.paginateData();
+      },
+    });
+    
   }
 
   changeRol() {
-
     this.setupGridColumns();
     this.getDataGrid();
-
   }
 
   openUserModal(): void {
-    this.isOpenModal = true;
+    this.userModal.openModal();
   }
 
-  closeFileUpload(): void {
-    this.isOpenModal = false;
-    // this.uploadForm.reset();
+  closeModal() {
+    this.userModal.closeModal();
+    this.userForm.reset();
   }
 
   saveUser() {
+
+    const data = this.userForm.value;
+
+    if (this.userForm.invalid) {
+      this.userForm.markAllAsTouched();
+      return;
+    }
+
+    const body = {
+      fullName: this.userForm.get('fullName')?.value,
+      userName: this.userForm.get('userName')?.value,
+      password: this.userForm.get('password')?.value,
+      role: this.userForm.get('roleId')?.value
+    }
+
+    this.userService.createUser(body).subscribe({
+      next: (value) => {
+          this.userModal.closeModal();
+          this.getDataGrid();
+      },
+    });
 
   }
 
@@ -133,7 +159,7 @@ export class UsersComponent implements OnInit {
     const errors: any = this.userForm.get(controlName)?.errors;
 
     if (errors?.required) return 'Campo Requerido';
-    if (errors?.userNameExists) {
+    if (errors?.userExists) {
       return 'Este usuario ya existe'
     }
     else{

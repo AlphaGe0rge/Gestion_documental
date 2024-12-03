@@ -62,60 +62,58 @@
 </div>
   
 
-<div class="modal" tabindex="-1" [ngClass]="{'show d-block': isOpenModal}">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Nuevo usuario</h5>
-        <button type="button" class="btn-close" (click)="closeFileUpload()"></button>
-      </div>
-      <div class="modal-body">
-        <form [formGroup]="userForm">
-          <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="form-group mb-3">
-                    <div class="d-flex justify-content-between">
-                        <label for="fullName">Nombre</label>
-                        <small class="text-danger" *ngIf="formInvalid('fullName')">{{getErrorMessage('fullName')}}</small>
-                    </div>
-                    <input type="text" class="form-control" id="fullName" formControlName="fullName" name="fullName" placeholder="Ingresa el nombre">
-                </div>
+<app-modal #userModal
+  [modalTitle]="'Crear Usuario'" 
+  [modalSize]="'medium'" 
+  [modalId]="'create'"
+  (modalClose)="closeModal()"
+  (confirm)="saveUser()">
 
-                <div class="form-group mb-3">
-                    <div class="d-flex justify-content-between">
-                        <label for="userName">Usuario</label>
-                        <small class="text-danger" *ngIf="formInvalid('userName')">{{getErrorMessage('userName')}}</small>
-                    </div>
-                    <input type="text" class="form-control" id="userName" formControlName="userName" placeholder="Ingresa el usuario">
-                </div>
-
-                <div class="form-group mb-3">
-                    <div class="d-flex justify-content-between">
-                        <label for="password">Contraseña</label>
-                        <small class="text-danger" *ngIf="formInvalid('password')">{{getErrorMessage('password')}}</small>
-                    </div>
-                    <input type="password" class="form-control" id="password" formControlName="password" placeholder="Ingresa la contraseña">
-                </div>
-
-                <div class="form-group mb-3">
-                    <div class="d-flex justify-content-between">
-                        <label for="studentPhone">Rol</label>
-                        <small class="text-danger" *ngIf="formInvalid('roleId')">{{getErrorMessage('roleId')}}</small>
-                    </div>
-                    <select class="form-control">
-                      <option>Admin</option>
-                      <option>Abogado</option>
-                    </select>
-                </div>
-            </div>
-          </div>
-
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeFileUpload()">Cancelar</button>
-        <button type="button" class="btn btn-primary" (click)="saveUser()" [disabled]="userForm.invalid">Agregar Usuario</button>
-      </div>
-    </div>
+  <div modal-header>
+    <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
   </div>
-</div>
+
+  <div modal-body>
+    <form [formGroup]="userForm">
+      <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="form-group mb-3">
+                <div class="d-flex justify-content-between">
+                    <label for="fullName">Nombre</label>
+                    <small class="text-danger" *ngIf="formInvalid('fullName')">{{getErrorMessage('fullName')}}</small>
+                </div>
+                <input type="text" class="form-control" id="fullName" formControlName="fullName" name="fullName" placeholder="Ingresa el nombre">
+            </div>
+
+            <div class="form-group mb-3">
+                <div class="d-flex justify-content-between">
+                    <label for="userName">Usuario</label>
+                    <small class="text-danger" *ngIf="formInvalid('userName')">{{getErrorMessage('userName')}}</small>
+                </div>
+                <input type="text" class="form-control" id="userName" formControlName="userName" placeholder="Ingresa el usuario">
+            </div>
+
+            <div class="form-group mb-3">
+                <div class="d-flex justify-content-between">
+                    <label for="password">Contraseña</label>
+                    <small class="text-danger" *ngIf="formInvalid('password')">{{getErrorMessage('password')}}</small>
+                </div>
+                <input type="password" class="form-control" id="password" formControlName="password" placeholder="Ingresa la contraseña">
+            </div>
+
+            <div class="form-group mb-3">
+                <div class="d-flex justify-content-between">
+                    <label for="role">Rol</label>
+                    <small class="text-danger" *ngIf="formInvalid('roleId')">{{getErrorMessage('roleId')}}</small>
+                </div>
+                <select class="form-control" formControlName="roleId" id="role">
+                  <option value="admin">Admin</option>
+                  <option value="lawyer">Abogado</option>
+                </select>
+            </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</app-modal>

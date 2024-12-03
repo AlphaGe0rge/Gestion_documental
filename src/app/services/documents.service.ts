@@ -51,8 +51,12 @@ export class DocumentsService {
   }
 
   // Eliminar un archivo o carpeta
-  deleteDocument(id: number): Observable<any> {
+  deleteDocument(id: any): Observable<any> {
     return this.http.delete(`${this.apiUrl}/delete/${id}`);
   }
 
+  deleteFolder(id: any): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/delete-folder/${id}`);
+  }
+  
 }

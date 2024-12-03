@@ -9,7 +9,6 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-
   
   authForm: FormGroup;
 
@@ -34,26 +33,26 @@ export class LoginComponent implements OnInit {
 
   login(){
 
-    // this.authForm.markAllAsTouched();
+    this.authForm.markAllAsTouched();
 
-    // if (this.authForm.valid) {
+    if (this.authForm.valid) {
 
-    //   console.log(this.authForm.value)
+      console.log(this.authForm.value)
 
-    //   this.authService.login(this.authForm.value).subscribe(data=>{
-    //      console.log(data);
+      this.authService.login(this.authForm.value).subscribe(data=>{
+         console.log(data);
 
-    //      this.router.navigate(['/dashboard/cases']);
-    //   },
-    //   error => {
-    //     console.log(error)
-    //     this.formInvalid = true; 
-    //   });
+         this.router.navigate(['/dashboard/cases']);
+      },
+      error => {
+        console.log(error)
+        this.formInvalid = true; 
+      });
 
-    // }
-    // else {
-    //   this.formInvalid = true
-    // }
+    }
+    else {
+      this.formInvalid = true
+    }
 
     this.router.navigate(['/dashboard/cases']);
 

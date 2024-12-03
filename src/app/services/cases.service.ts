@@ -27,7 +27,7 @@ export class CasesService {
     return this.http.put(`${this.baseUrl}/${id}`, data);
   }
 
-  deleteCase(id: number): Observable<any> {
+  deleteCase(id: any): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }

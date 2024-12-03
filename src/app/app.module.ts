@@ -11,9 +11,12 @@ import { CasesComponent } from './cases/cases.component';
 import { DocumentsComponent } from './documents/documents.component';
 import { UserSettingsComponent } from './user-settings/user-settings.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 import { SafeUrlPipe } from './pipes/safeUrl';
 import { DataGridComponent } from './widgets/data-grid/data-grid.component';
 import { UsersComponent } from './users/users.component';
+import { ModalComponent } from './widgets/modal/modal.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +28,7 @@ import { UsersComponent } from './users/users.component';
     UserSettingsComponent,
     DataGridComponent,
     UsersComponent,
+    ModalComponent,
     SafeUrlPipe
   ],
   imports: [
@@ -32,7 +36,9 @@ import { UsersComponent } from './users/users.component';
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    FormsModule
+    BrowserAnimationsModule,
+    ToastrModule.forRoot(),
+    FormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

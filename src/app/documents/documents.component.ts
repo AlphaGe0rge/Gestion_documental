@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DocumentsService } from '../services/documents.service';
 import { CasesService } from '../services/cases.service';
 
 import { saveAs } from 'file-saver'; // Importar correctamente la librería
+import { NotificationsService } from '../services/notifications.service';
+import { ModalComponent } from '../widgets/modal/modal.component';
 
 @Component({
   selector: 'app-documents',
@@ -11,8 +13,10 @@ import { saveAs } from 'file-saver'; // Importar correctamente la librería
   styleUrls: ['./documents.component.css']
 })
 export class DocumentsComponent implements OnInit {
+
   folderPath: any[] = [];
   currentFolders: any[] = [];
+  currentFolder: any = null;
   currentFiles: any[] = [];
   uploadForm: FormGroup;
   folderForm: FormGroup;
@@ -21,11 +25,18 @@ export class DocumentsComponent implements OnInit {
   isFileUploadOpen: boolean = false;
   selectedFile: File | null = null;
   currentFileUrl: string | null = null;
+  fileId: string = "";
+  folderId: any = null;
+  type: string  = "";
+
+  @ViewChild('confirmModal', {static: false}) confirmModal!: ModalComponent; 
+  @ViewChild('fileUploadModal', {static: false}) fileUploadModal!: ModalComponent; 
 
   constructor(
     private documentService: DocumentsService,
     private casesService: CasesService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private notificationService: NotificationsService
   ) {
     this.uploadForm = this.fb.group({
       title: ['', Validators.required]
@@ -41,55 +52,11 @@ export class DocumentsComponent implements OnInit {
   }
 
   loadCases(): void {
-    // this.casesService.getAllCases().subscribe(
-    //   (data) => this.cases = data,
-    //   (error) => console.error('Error al cargar los casos', error)
-    // );
-
-    this.cases = [
-      {          
-        caseId: "e27b1e5f-a785-4cd3-9256-08e318d76804",
-        title: "caso 1",
-        description: "pruebas caso 1",
-        userId: "54992aea-ed7c-4c3c-9e19-88ac61e16aef",
-        status: true,
-        createdAt: "2024-11-10T13:43:53.000Z",
-        updatedAt: "2024-11-10T13:43:53.000Z",
-        Documents: [
-            {
-                documentId: "9326c9a2-43f9-4ac2-8e4e-d04b23e01289",
-                name: "foto perfil",
-                filePath: "perfil-1731247418114.avif",
-                fileType: "avif",
-                uploadedAt: "2024-11-10T14:03:38.000Z",
-                folderId: "a905fa8c-e411-4e8f-91a1-b458e8da3cdb",
-                caseId: "e27b1e5f-a785-4cd3-9256-08e318d76804",
-                createdAt: "2024-11-10T14:03:38.000Z",
-                updatedAt: "2024-11-10T14:03:38.000Z"
-            }
-        ]
-      },
-      {
-          caseId: "70fea6bd-f2c6-4fee-a030-883d5b7c147c",
-          title: "caso 2",
-          description: "prueba caso 2",
-          userId: "54992aea-ed7c-4c3c-9e19-88ac61e16aef",
-          status: true,
-          createdAt: "2024-11-10T13:45:02.000Z",
-          updatedAt: "2024-11-10T13:45:02.000Z",
-          Documents: []
-      },
-      {
-          caseId: "dc1ff08f-e4a2-4efd-9453-8de1c45e8077",
-          title: "caso 3",
-          description: "prueba caso 3",
-          userId: "54992aea-ed7c-4c3c-9e19-88ac61e16aef",
-          status: true,
-          createdAt: "2024-11-10T13:45:24.000Z",
-          updatedAt: "2024-11-10T13:45:24.000Z",
-          Documents: []
-      }
-  ]
+    
+    this.casesService.getAllCases().subscribe(
+      (data) => this.cases = data,
+      (error) => console.error('Error al cargar los casos', error)
+    );
 
   }
 
@@ -136,26 +103,46 @@ export class DocumentsComponent implements OnInit {
 
   createFolder(): void {
 
-    if (this.folderForm.invalid) return;
+    if (this.folderForm.invalid) {
+      this.notificationService.warning('Formulario Invalido');
+      this.folderForm.markAllAsTouched();
+      return;
+    }
 
     const folderName = this.folderForm.get('folderName')?.value;
     const caseId = this.folderForm.get('caseId')?.value;
     const parentFolderId = this.folderPath.length ? this.folderPath[this.folderPath.length - 1].folderId : null;
 
     this.documentService.createFolder({ name: folderName, caseId, parentFolderId }).subscribe({
-      next: () => {
-        this.navigateToFolder(this.folderPath[this.folderPath.length - 1]);
+      next: (data) => {
+
+        if (this.currentFolder) {
+
+          this.documentService.getFolderContents(this.currentFolder.folderId).subscribe({
+            next: (data) => {
+              this.currentFolders = data.folders;
+              this.currentFiles = data.files;
+            },
+            error: (error) => console.error('Error al cargar la carpeta', error)
+          });
+        }
+        else {
+          this.loadRootFolder(caseId);
+        }
+
         this.closeFolderModal();
       },
       error: (error) => console.error('Error al crear la carpeta', error)
     });
   }
 
-  navigateToFolder(folder: any): void {
+  navigateToFolder(folder: any, navigate: any = true): void {
     
     if (!this.folderPath.find(o => o.folderId === folder.folderId)) {
       this.folderPath.push(folder);
     }
+
+    this.currentFolder = folder;
 
     this.documentService.getFolderContents(folder.folderId).subscribe({
       next: (data) => {
@@ -177,6 +164,7 @@ export class DocumentsComponent implements OnInit {
       this.navigateToFolder(parentFolder);
     } 
     else {
+      this.currentFolder = null;
       this.cases.map(o => o.isOpen = false);
       this.currentFiles = [];
     }
@@ -184,6 +172,7 @@ export class DocumentsComponent implements OnInit {
 
   openFileUpload(): void {
     this.isFileUploadOpen = true;
+    this.fileUploadModal.openModal();
   }
 
   closeFileUpload(): void {
@@ -197,7 +186,62 @@ export class DocumentsComponent implements OnInit {
     this.selectedFile = input.files ? input.files[0] : null;
   }
 
+  openConfirmModal(id: any, type: string) {
+
+    this.type = type;
+    this.confirmModal.openModal();
+
+    if (type === "folder") this.folderId = id;
+    if (type === "file") this.fileId = id;
+
+  }
+
+  confirmDelete() {
+
+    if (this.type === "folder") {
+
+      this.documentService.deleteFolder(this.folderId.folderId).subscribe((o: any) => {
+
+        if (this.currentFolder) {
+
+          this.documentService.getFolderContents(this.currentFolder.folderId).subscribe({
+            next: (data) => {
+              this.currentFolders = data.folders;
+              this.currentFiles = data.files;
+              this.folderId = null;
+            },
+            error: (error) => console.error('Error al cargar la carpeta', error)
+          });
+        }
+        else {
+          this.loadRootFolder(this.folderId.caseId);
+        }
+
+      })
+    }
+    else {
+      
+      this.documentService.deleteDocument(this.fileId).subscribe((o) => {
+
+        this.documentService.getFolderContents(this.currentFolder.folderId).subscribe({
+          next: (data) => {
+            this.currentFolders = data.folders;
+            this.currentFiles = data.files;
+            this.fileId = "";
+          },
+          error: (error) => console.error('Error al cargar la carpeta', error)
+        });
+    
+      }, error => {
+        console.log(error)
+      });
+
+    }
+
+  }
+
   uploadFile(): void {
+
     if (!this.selectedFile) return;
 
     const title = this.uploadForm.get('title')?.value;
@@ -213,13 +257,23 @@ export class DocumentsComponent implements OnInit {
     this.documentService.uploadDocument(formData).subscribe({
       next: () => {
         this.navigateToFolder(this.folderPath[this.folderPath.length - 1]);
-        this.closeFileUpload();
+        this.fileUploadModal.closeModal();
       },
       error: (error) => console.error('Error al subir el archivo', error)
     });
   }
 
   openFolderModal(): void {
+    
+    if (this.currentFolder) {
+      this.folderForm.get('caseId')?.setValue(this.currentFolder.caseId);
+      this.folderForm.get('caseId')?.disable();
+    }
+    else {
+      this.folderForm.get('caseId')?.enable();
+      this.folderForm.get('caseId')?.setValue("");
+    }
+
     this.isFolderModalOpen = true;
   }
 
@@ -238,21 +292,53 @@ deleteFolder(folder: any) {
   console.log('Eliminar carpeta:', folder);
 }
 
-// Método para eliminar un archivo
-deleteFile(file: any) {
-  // Lógica para eliminar el archivo
-  console.log('Eliminar archivo:', file);
-}
+  // Método para descargar un archivo
+  downloadFile(file: any) {
+  
+    console.log(file); // Verificar que el archivo esté correctamente recibido
+    this.documentService.downloadDocument(file.documentId).subscribe((response) => {
+      saveAs(response, file.name);
+    }, error => {
+      console.log(error)
+    });
+  
+  }
 
-// Método para descargar un archivo
-downloadFile(file: any) {
+  getFileIconClass(fileType: string): string {
+  
+    switch (fileType) {
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+        return 'bi bi-image-fill'; // Ícono para imágenes
+      case 'pdf':
+        return 'bi bi-file-pdf-fill'; // Ícono para PDF
+      case 'doc':
+      case 'docx':
+        return 'bi bi-file-word-fill'; // Ícono para documentos Word
+      case 'xls':
+      case 'xlsx':
+        return 'bi bi-file-spreadsheet-fill'; // Ícono para Excel
+      case 'ppt':
+      case 'pptx':
+        return 'bi bi-file-ppt-fill'; // Ícono para PowerPoint
+      case 'zip':
+      case 'rar':
+        return 'bi bi-file-zip-fill'; // Ícono para archivos comprimidos
+      case 'txt':
+        return 'bi bi-file-text-fill'; // Ícono para archivos de texto
+      case 'mp4':
+      case 'mkv':
+      case 'avi':
+        return 'bi bi-file-play-fill'; // Ícono para videos
+      default:
+        return 'bi bi-file-earmark-fill'; // Ícono por defecto
+    }
+  }
 
-  console.log(file); // Verificar que el archivo esté correctamente recibido
-  this.documentService.downloadDocument(file.documentId).subscribe((response) => {
-    saveAs(response, file.name);
-  }, error => {
-    console.log(error)
-  });
+  formInvalid(form: string) {
+    return this.folderForm.get(form)?.invalid && this.folderForm.get(form)?.touched 
+  }
 
-}
 }

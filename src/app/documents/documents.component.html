@@ -5,7 +5,7 @@
   <div class="actions mt-3 d-flex justify-content-between">
     <div>
       <button class="btn btn-primary me-2" (click)="openFolderModal()">Nueva Carpeta</button>
-      <button class="btn btn-success" (click)="openFileUpload()">Subir Archivos</button>
+      <button class="btn btn-success" *ngIf="currentFolder" (click)="openFileUpload()">Subir Archivos</button>
     </div>
     <button class="btn btn-secondary" (click)="goBack()" [disabled]="folderPath.length === 0">Volver</button>
   </div>
@@ -30,11 +30,17 @@
         <div class="modal-body">
           <form [formGroup]="folderForm">
             <div class="mb-3">
-              <label for="folderName" class="form-label">Nombre de la Carpeta</label>
+              <div class="d-flex justify-content-between">
+                <label for="folderName">Nombre de la carpeta</label>
+                <small class="text-danger" *ngIf="formInvalid('folderName')">Nombre requerido</small>
+              </div>              
               <input type="text" id="folderName" formControlName="folderName" class="form-control" />
             </div>
             <div class="mb-3">
-              <label for="caseSelector" class="form-label">Seleccionar Caso</label>
+              <div class="d-flex justify-content-between">
+                <label for="caseSelector">Seleccionar Caso</label>
+                <small class="text-danger" *ngIf="formInvalid('caseId')">Caso requerido</small>
+              </div>
               <select id="caseSelector" formControlName="caseId" class="form-select">
                 <option *ngFor="let case of cases" [value]="case.caseId">{{ case.title }}</option>
               </select>
@@ -100,7 +106,7 @@
 
                     <ul class="dropdown-menu" aria-labelledby="folderMenu"> 
 
-                      <li><button class="dropdown-item" (click)="deleteFolder(folder)">Eliminar Carpeta</button></li> 
+                      <li><button class="dropdown-item" (click)="openConfirmModal(folder, 'folder'); $event.stopPropagation()">Eliminar Carpeta</button></li> 
 
                     </ul> 
        
@@ -145,7 +151,7 @@
 
               <ul class="dropdown-menu" aria-labelledby="folderMenu"> 
 
-                <li><button class="dropdown-item" (click)="deleteFolder(folder)">Eliminar Carpeta</button></li> 
+                <li><button class="dropdown-item" (click)="openConfirmModal(folder, 'folder'); $event.stopPropagation()">Eliminar Carpeta</button></li> 
 
               </ul> 
 
@@ -166,14 +172,14 @@
       <div class="col-md-3" *ngFor="let file of currentFiles">
         <div class="card file-card mt-3" (click)="viewDocument(file.url)">
           <div class="card-body text-center">
-            <i class="bi bi-file-earmark-fill file-icon"></i>
+            <i [ngClass]="getFileIconClass(file.fileType)" class="file-icon"></i>
             <h6 class="card-title">{{ file.name }}</h6>
             <div class="dropdown position-absolute top-0 end-0 p-2"> 
               <button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-three-dots-vertical"></i>
               </button>
               <ul class="dropdown-menu">
-                <li><button class="dropdown-item" (click)="deleteFile(file)">Eliminar Archivo</button></li>
+                <li><button class="dropdown-item" (click)="openConfirmModal(file.documentId, 'file')">Eliminar Archivo</button></li>
                 <li><button class="dropdown-item" (click)="downloadFile(file)">Descargar Archivo</button></li>
               </ul>
             </div>
@@ -193,7 +199,7 @@
   </div>
 
   <!-- Modal para subir archivos -->
-  <div class="modal" tabindex="-1" [ngClass]="{'show d-block': isFileUploadOpen}">
+  <!-- <div class="modal" tabindex="-1" [ngClass]="{'show d-block': isFileUploadOpen}">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -217,5 +223,55 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
+
 </div>
+
+  <app-modal #confirmModal
+      [modalTitle]="'Confirmar Eliminación'" 
+      [modalSize]="'medium'" 
+      [modalId]="'confirmDelete'"
+      [showConfirm]="false"
+      (confirm)="confirmDelete()">
+  
+      <div modal-header>
+        <button type="button" class="btn-close" (click)="confirmModal.closeModal()" aria-label="Close"></button>
+      </div>
+  
+      <div modal-body>
+        
+        <div class="modal-message m-b-5">
+          {{(type === 'folder') ? '¿quieres eliminar esta carpeta?' : '¿quieres eliminar este archivo?'}}
+        </div>
+  
+      </div>
+  
+  </app-modal>
+
+  <app-modal #fileUploadModal
+    [modalTitle]="'Subir Archivo'" 
+    [modalSize]="'medium'" 
+    [modalId]="'create'"
+    (modalClose)="closeFileUpload()"
+    (confirm)="uploadFile()">
+
+  <div modal-header>
+    <button type="button" class="btn-close" (click)="fileUploadModal.closeModal();" aria-label="Close"></button>
+  </div>
+
+  <div modal-body>
+  
+    <form [formGroup]="uploadForm">
+      <div class="mb-3">
+        <label for="fileTitle" class="form-label">Título del Archivo</label>
+        <input type="text" id="fileTitle" formControlName="title" class="form-control" placeholder="Escribe el título del archivo" />
+      </div>
+      <div class="mb-3">
+        <input type="file" (change)="onFileSelected($event)" class="form-control" />
+      </div>
+    </form>
+
+  </div>
+
+</app-modal>
+
