@@ -9,6 +9,8 @@ export class AuthService {
 
   usuario:any = {};
 
+  private tokenKey = 'token';
+
   private baseUrl = 'http://localhost:8081/api/auth';
   private tokenSubject = new BehaviorSubject<string | null>(null);
   token$ = this.tokenSubject.asObservable();
@@ -36,6 +38,15 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('token');
     this.tokenSubject.next(null);
+  }
+
+  setToken(token: string): void {
+    localStorage.setItem(this.tokenKey, token);
+  }
+
+  // Obtiene el token del almacenamiento local
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
   }
 
 }

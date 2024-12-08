@@ -4,6 +4,7 @@ import { DataGridComponent } from 'src/app/widgets/data-grid/data-grid.component
 import { UserService } from '../services/user.service';
 import { ModalComponent } from '../widgets/modal/modal.component';
 import { UserValidatorService } from '../validators/user-validator.service';
+import { NotificationsService } from '../services/notifications.service';
 @Component({
   selector: 'app-add-users',
   templateUrl: './users.component.html',
@@ -64,7 +65,8 @@ export class UsersComponent implements OnInit {
   constructor(private changeDetectorRef:ChangeDetectorRef,
               private fb: FormBuilder,
               private userService: UserService,
-              private userValidator: UserValidatorService
+              private userValidator: UserValidatorService,
+              private notificationService: NotificationsService
   ) { 
     this.dataGrid = new DataGridComponent();
   }
@@ -121,7 +123,6 @@ export class UsersComponent implements OnInit {
   }
 
   closeModal() {
-    this.userModal.closeModal();
     this.userForm.reset();
   }
 
@@ -130,6 +131,7 @@ export class UsersComponent implements OnInit {
     const data = this.userForm.value;
 
     if (this.userForm.invalid) {
+      this.notificationService.success('Formulario invalido');
       this.userForm.markAllAsTouched();
       return;
     }
@@ -143,6 +145,7 @@ export class UsersComponent implements OnInit {
 
     this.userService.createUser(body).subscribe({
       next: (value) => {
+          this.notificationService.success('Usuario creado');
           this.userModal.closeModal();
           this.getDataGrid();
       },

@@ -22,3 +22,7 @@
 .header-container .btn {
     margin-left: 10px; /* Añadir algo de espacio entre los botones */
 }
+
+button {
+    cursor: pointer !important;
+}

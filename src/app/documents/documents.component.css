@@ -109,28 +109,75 @@
   position: relative;
 }
 
-/* Dropdown en la Esquina Superior Derecha */
-.dropdown-toggle::after {
-  display: none; /* Oculta la flecha del dropdown */
-}
-.dropdown-toggle:hover {
-  background-color: gray;
-  border-radius: 30px;
-}
-.dropdown.position-absolute {
-  top: 10px;
-  right: 10px;
-}
-
-/* Área de Documentos y Carpetas Vacías */
-.document-area .d-flex {
-  color: #6c757d;
-  font-weight: bold;
-}
-
-/* Estilos para la Vista Previa del Archivo */
-iframe {
+/* Contenedor de filtros */
+.filters-container {
+  max-width: 90%;
+  margin: 0 auto;
+  background-color: #f8f9fa; /* Fondo claro */
   border: 1px solid #ddd;
-  border-radius: 5px;
-  overflow: hidden;
+  border-radius: 0.375rem;
+  padding: 20px;
+}
+
+/* Ajustar el espaciado entre inputs */
+.filters-container .form-control {
+  margin-bottom: 10px; /* Separar filtros verticalmente */
+}
+
+/* Lista desplegable de autocompletado */
+.position-relative .dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px); /* Espacio entre input y lista */
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  border: 1px solid #ddd;
+  border-radius: 0.375rem;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  max-height: 200px; /* Limitar altura */
+  overflow-y: auto; /* Scroll si es necesario */
+  padding: 0;
+}
+
+/* Estilizar los elementos de la lista */
+.dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0; /* Fondo claro al pasar el cursor */
+}
+
+/* Scroll personalizado para la lista */
+.dropdown-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background-color: #007bff; /* Azul Bootstrap */
+  border-radius: 10px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+  background: #f8f9fa;
+}
+
+/* Encabezado principal */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header-container h2 {
+  font-size: 1.5rem;
+}
+
+/* Botones */
+.header-container .btn {
+  margin-left: 10px;
 }

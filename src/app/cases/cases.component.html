@@ -2,12 +2,46 @@
 
   <div class="header-container justify-content-between">
     <h2 class="mb-3">Gestión de Casos</h2>
-    <button class="btn btn-primary mb-3" (click)="openAddCaseModal()">Agregar Caso</button>
+    <div>
+      <button type="button" class="btn btn-primary" (click)="loadCases()">
+        <i class="bi bi-arrow-repeat"></i> Buscar
+      </button>
+      <button class="btn btn-primary" (click)="openAddCaseModal()">Agregar Caso</button>
+      <button class="btn btn-secondary" (click)="changeStatus()">Estado</button>
+    </div>
   </div>
 
     <!-- Filtros -->
   <div>
     <form class="row g-3 align-items-end filters-container">
+
+      <div class="col-md-3 position-relative">
+        <label for="abogado" class="form-label">Abogado</label>
+        <input
+          type="text"
+          id="abogado"
+          [(ngModel)]="filters.lawyerName"
+          (input)="searchUsers(filters.lawyerName)"
+          class="form-control"
+          placeholder="Buscar abogado"
+          (blur)="clearFilterIfInvalid()"
+          name="lawyer"
+          autocomplete="off"
+        />
+        <ul
+          *ngIf="filteredUsers.length > 0"
+          class="dropdown-menu show w-100"
+          style="max-height: 200px; overflow-y: auto;"
+        >
+          <li
+            *ngFor="let user of filteredUsers"
+            (click)="selectUser(user)"
+            class="dropdown-item"
+          >
+            {{ user.fullName }}
+          </li>
+        </ul>
+      </div>
         
         <div class="col-md-3">
           <label for="nombre" class="form-label">Title</label>
@@ -22,26 +56,19 @@
         </div>
 
         <div class="col-md-3">
-          <label for="dueDate">Fecha de creación</label>
-          <input type="date" id="dueDate" class="form-control" [(ngModel)]="filters.date" name="dateRange">
+          <label for="dateFrom">Desde fecha de creación</label>
+          <input type="date" id="dateFrom" class="form-control" [(ngModel)]="filters.dateFrom" name="dateFrom">
+        </div>
+
+        <div class="col-md-3">
+          <label for="dateTo">Hasta fecha de creación</label>
+          <input type="date" id="dateTo" class="form-control" [(ngModel)]="filters.dateTo" name="dateTo">
         </div>
   
-        <!-- <div class="col-md-3">
-          <label for="usuario" class="form-label">Usuario</label>
-          <input
-            type="text"
-            id="usuario"
-            [(ngModel)]="filters.usuario"
-            name="usuarioFilter"
-            class="form-control"
-            placeholder="Enter usuario"
-          />
-        </div> -->
-  
         <div class="col-md-3">
-          <label for="status" class="form-label">Status</label>
+          <label for="status" class="form-label">Estado</label>
           <select id="status" class="form-control" [(ngModel)]="filters.status" name="status">
-            <option *ngFor="let statu of status" [value]="statu.value">{{statu.name}}</option>
+            <option *ngFor="let statu of status" [ngValue]="statu.value">{{statu.name}}</option>
           </select>
         </div>
   
@@ -52,6 +79,8 @@
     <app-data-grid #dataGrid
                    [columns]="gridColumns"
                    [data]="cases"
+                   [selectMulti]="true"
+                   [showSelector]="true"
                    [showEdit]="true"
                    [showDelete]="true"
                    (editEvent)="editRow($event)"
@@ -60,10 +89,11 @@
   </div>
 
   <app-modal #caseModal
-    [modalTitle]="'Crear Caso'" 
+    [modalTitle]="(isEditing) ? 'Editar caso' : 'Crear caso'"  
     [modalSize]="'medium'" 
     [modalId]="'create'"
-    (modalClose)="closeModal()"
+    [showConfirm]="false"
+    (modalClose)="currentCaseId = null"
     (confirm)="saveCase()">
   
     <div modal-header>

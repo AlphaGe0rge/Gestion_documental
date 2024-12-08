@@ -6,6 +6,7 @@ import { CasesService } from '../services/cases.service';
 import { saveAs } from 'file-saver'; // Importar correctamente la librería
 import { NotificationsService } from '../services/notifications.service';
 import { ModalComponent } from '../widgets/modal/modal.component';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-documents',
@@ -29,6 +30,34 @@ export class DocumentsComponent implements OnInit {
   folderId: any = null;
   type: string  = "";
 
+  filteredUsers: any [] = [];
+
+  filters: any = {
+    title: "",
+    status: null,
+    dateFrom: null,
+    dateTo: null,
+    lawyerName: null
+  }
+
+  selectedLawyerId =  null;
+
+  status = [
+    {
+      value: null,
+      name: 'All'
+    },
+    {
+      value: true,
+      name: 'Active'
+    },
+    {
+      value: false,
+      name: 'Inactive'
+    }
+  ]
+
+
   @ViewChild('confirmModal', {static: false}) confirmModal!: ModalComponent; 
   @ViewChild('fileUploadModal', {static: false}) fileUploadModal!: ModalComponent; 
 
@@ -36,7 +65,8 @@ export class DocumentsComponent implements OnInit {
     private documentService: DocumentsService,
     private casesService: CasesService,
     private fb: FormBuilder,
-    private notificationService: NotificationsService
+    private notificationService: NotificationsService,
+    private userService: UserService
   ) {
     this.uploadForm = this.fb.group({
       title: ['', Validators.required]
@@ -48,12 +78,41 @@ export class DocumentsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    
+    const today = new Date();
+    const todayFormatted = today.toISOString().split('T')[0];
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7); // Restar 7 días
+    const sevenDaysAgoFormatted = sevenDaysAgo.toISOString().split('T')[0];
+
+    this.filters.dateFrom = sevenDaysAgoFormatted;
+    this.filters.dateTo = todayFormatted;
+
     this.loadCases();
   }
 
   loadCases(): void {
+
+    let where: any = {};
+
+    if (this.filters.title) where.title = this.filters.title;
+    if (this.filters.dateFrom) where.dateFrom = this.filters.dateFrom;
+    if (this.filters.dateTo) {
+
+      let date = new Date(this.filters.dateTo);
+
+      date.setDate(date.getDate() + 1);
+      const today = date.toISOString().split('T')[0];
+
+      where.dateTo = today;
+
+    }
+
+    if (typeof this.filters.status === "boolean") where.status = this.filters.status;
+    if (this.selectedLawyerId) where.userId = this.selectedLawyerId;
     
-    this.casesService.getAllCases().subscribe(
+    this.casesService.getAllCases(where).subscribe(
       (data) => this.cases = data,
       (error) => console.error('Error al cargar los casos', error)
     );
@@ -114,7 +173,10 @@ export class DocumentsComponent implements OnInit {
     const parentFolderId = this.folderPath.length ? this.folderPath[this.folderPath.length - 1].folderId : null;
 
     this.documentService.createFolder({ name: folderName, caseId, parentFolderId }).subscribe({
+
       next: (data) => {
+
+        this.notificationService.success('Carpeta Creada');
 
         if (this.currentFolder) {
 
@@ -202,6 +264,8 @@ export class DocumentsComponent implements OnInit {
 
       this.documentService.deleteFolder(this.folderId.folderId).subscribe((o: any) => {
 
+        this.notificationService.success('Carpeta Eliminada');
+
         if (this.currentFolder) {
 
           this.documentService.getFolderContents(this.currentFolder.folderId).subscribe({
@@ -223,6 +287,8 @@ export class DocumentsComponent implements OnInit {
       
       this.documentService.deleteDocument(this.fileId).subscribe((o) => {
 
+        this.notificationService.success('Archivo Eliminado');
+
         this.documentService.getFolderContents(this.currentFolder.folderId).subscribe({
           next: (data) => {
             this.currentFolders = data.folders;
@@ -242,7 +308,15 @@ export class DocumentsComponent implements OnInit {
 
   uploadFile(): void {
 
-    if (!this.selectedFile) return;
+    if (this.uploadForm.invalid) {
+      this.notificationService.warning('Formulario invalido');
+      return;
+    }
+
+    if (!this.selectedFile) {
+      this.notificationService.warning('Archivo no seleccionado');
+      return;
+    }
 
     const title = this.uploadForm.get('title')?.value;
     const formData = new FormData();
@@ -255,7 +329,9 @@ export class DocumentsComponent implements OnInit {
     formData.append('folderId', parentFolder.folderId);
 
     this.documentService.uploadDocument(formData).subscribe({
+      
       next: () => {
+        this.notificationService.success('Archivo Subido');
         this.navigateToFolder(this.folderPath[this.folderPath.length - 1]);
         this.fileUploadModal.closeModal();
       },
@@ -282,20 +358,9 @@ export class DocumentsComponent implements OnInit {
     this.folderForm.reset();
   }
 
-  viewDocument(url: string): void {
-    this.currentFileUrl = url;
-  }
-
-  // Método para eliminar una carpeta
-deleteFolder(folder: any) {
-  // Lógica para eliminar la carpeta
-  console.log('Eliminar carpeta:', folder);
-}
-
   // Método para descargar un archivo
   downloadFile(file: any) {
   
-    console.log(file); // Verificar que el archivo esté correctamente recibido
     this.documentService.downloadDocument(file.documentId).subscribe((response) => {
       saveAs(response, file.name);
     }, error => {
@@ -340,5 +405,53 @@ deleteFolder(folder: any) {
   formInvalid(form: string) {
     return this.folderForm.get(form)?.invalid && this.folderForm.get(form)?.touched 
   }
+
+    // Método para buscar usuarios por nombre
+    searchUsers(name: string): void {
+
+      if (!name) {
+        this.filteredUsers = [];
+        return;
+      }
+  
+      const where = { 
+        fullName: name
+      }; // Condición de búsqueda
+    
+      this.userService.getAllUsers(where).subscribe({
+        next: (data) => {
+          this.filteredUsers = data;
+        },
+        error: (err) => {
+          console.error('Error al buscar usuarios:', err);
+          this.filteredUsers = [];
+        },
+      });
+    }
+  
+    // Método para seleccionar un usuario del autocompletado
+    selectUser(user: any): void {
+      this.filters.lawyerName = user.fullName; // Mostrar el nombre seleccionado en el input
+      this.selectedLawyerId = user.userId; // Almacenar el ID del abogado seleccionado
+    }
+  
+    clearFilterIfInvalid(): void {
+  
+      setTimeout(() => {
+        const matchedUser = this.filteredUsers.find(
+          (user) =>
+            user.fullName.toLowerCase() === this.filters.lawyerName.toLowerCase()
+        );
+  
+        if (!matchedUser) {
+          this.filters.lawyerName = ''; // Limpiar el campo
+          this.selectedLawyerId = null; // Limpiar el ID
+        }
+  
+        this.filteredUsers = []; // Limpiar sugerencias
+  
+      }, 200); // Retraso para permitir que el `click` se ejecute primero
+  
+    }
 
 }

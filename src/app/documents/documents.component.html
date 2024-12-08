@@ -7,8 +7,81 @@
       <button class="btn btn-primary me-2" (click)="openFolderModal()">Nueva Carpeta</button>
       <button class="btn btn-success" *ngIf="currentFolder" (click)="openFileUpload()">Subir Archivos</button>
     </div>
-    <button class="btn btn-secondary" (click)="goBack()" [disabled]="folderPath.length === 0">Volver</button>
+    <button class="btn btn-secondary" *ngIf="currentFolder" (click)="goBack()" [disabled]="folderPath.length === 0">Volver</button>
   </div>
+
+  <div class="filters-container mt-4" *ngIf="!currentFolder">
+    <button class="btn btn-outline-primary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse" aria-expanded="false" aria-controls="filtersCollapse">
+      <i class="bi bi-funnel-fill"></i> Filtros
+    </button>
+    <div class="collapse" id="filtersCollapse">
+      <form class="row g-3 align-items-end">
+        <div class="col-md-3 position-relative">
+          <label for="abogado" class="form-label">Abogado</label>
+          <input
+            type="text"
+            id="abogado"
+            [(ngModel)]="filters.lawyerName"
+            (input)="searchUsers(filters.lawyerName)"
+            class="form-control"
+            placeholder="Buscar abogado"
+            (blur)="clearFilterIfInvalid()"
+            name="lawyer"
+            autocomplete="off"
+          />
+          <ul
+            *ngIf="filteredUsers.length > 0"
+            class="dropdown-menu show w-100"
+            style="max-height: 200px; overflow-y: auto;"
+          >
+            <li
+              *ngFor="let user of filteredUsers"
+              (click)="selectUser(user)"
+              class="dropdown-item"
+            >
+              {{ user.fullName }}
+            </li>
+          </ul>
+        </div>
+  
+        <div class="col-md-3">
+          <label for="nombre" class="form-label">Título</label>
+          <input
+            type="text"
+            id="nombre"
+            [(ngModel)]="filters.title"
+            name="nombreFilter"
+            class="form-control"
+            placeholder="Ingrese el título"
+          />
+        </div>
+  
+        <div class="col-md-3">
+          <label for="dateFrom">Desde Fecha de Creación</label>
+          <input type="date" id="dateFrom" class="form-control" [(ngModel)]="filters.dateFrom" name="dateFrom">
+        </div>
+  
+        <div class="col-md-3">
+          <label for="dateTo">Hasta Fecha de Creación</label>
+          <input type="date" id="dateTo" class="form-control" [(ngModel)]="filters.dateTo" name="dateTo">
+        </div>
+  
+        <div class="col-md-3">
+          <label for="status" class="form-label">Estado</label>
+          <select id="status" class="form-control" [(ngModel)]="filters.status" name="status">
+            <option *ngFor="let statu of status" [ngValue]="statu.value">{{statu.name}}</option>
+          </select>
+        </div>
+  
+        <div class="col-md-3">
+          <button type="button" class="btn btn-primary" (click)="loadCases()">
+            <i class="bi bi-arrow-repeat"></i> Buscar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
 
   <!-- Breadcrumb para navegación en las carpetas -->
   <nav aria-label="breadcrumb" class="mt-3">
@@ -98,13 +171,12 @@
 
                   <div class="dropdown position-absolute top-0 end-0 p-2" style="z-index: 1000;"> 
                      
-                    <button class="btn btn-link dropdown-toggle" type="button" id="folderMenu"  
-                      data-bs-toggle="dropdown" aria-expanded="false" 
+                    <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false" 
                       (click)="$event.stopPropagation()"> <!-- Evita la propagación del clic --> 
                       <i class="bi bi-three-dots-vertical"></i> 
                     </button> 
 
-                    <ul class="dropdown-menu" aria-labelledby="folderMenu"> 
+                    <ul class="dropdown-menu"> 
 
                       <li><button class="dropdown-item" (click)="openConfirmModal(folder, 'folder'); $event.stopPropagation()">Eliminar Carpeta</button></li> 
 
@@ -170,7 +242,7 @@
     <div class="row mt-4">
       <!-- Archivos -->
       <div class="col-md-3" *ngFor="let file of currentFiles">
-        <div class="card file-card mt-3" (click)="viewDocument(file.url)">
+        <div class="card file-card mt-3">
           <div class="card-body text-center">
             <i [ngClass]="getFileIconClass(file.fileType)" class="file-icon"></i>
             <h6 class="card-title">{{ file.name }}</h6>

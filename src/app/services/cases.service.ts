@@ -11,8 +11,8 @@ export class CasesService {
 
   constructor(private http: HttpClient) {}
 
-  getAllCases(): Observable<any> {
-    return this.http.get(this.baseUrl);
+  getAllCases(where: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/casesGet`, where);
   }
 
   getCaseById(id: number): Observable<any> {
