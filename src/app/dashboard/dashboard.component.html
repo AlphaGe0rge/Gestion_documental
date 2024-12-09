@@ -3,7 +3,10 @@
   <div class="bg-dark text-white p-3 row" style="width: 250px;">
     <div>
 
-      <h4>Gestión Documental</h4>
+      <div class="text-center mb-4">
+        <img src="../../assets/logo.webp" alt="CaseKeeper Logo" class="logo">
+      </div>
+      
       <ul class="nav flex-column mt-4">
         <li class="nav-item">
           <a class="nav-link text-white" [routerLink]="['/dashboard/cases']" routerLinkActive="active-link">Casos</a>
@@ -11,7 +14,7 @@
         <li class="nav-item">
           <a class="nav-link text-white" [routerLink]="['/dashboard/documents']" routerLinkActive="active-link">Documentos</a>
         </li>
-        <li class="nav-item">
+        <li *ngIf="usuario.role === 'admin'" class="nav-item">
           <a class="nav-link text-white" [routerLink]="['/dashboard/users']" routerLinkActive="active-link">Usuarios</a>
         </li>
         <li class="nav-item">

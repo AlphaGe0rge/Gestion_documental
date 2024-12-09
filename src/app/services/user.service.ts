@@ -24,4 +24,12 @@ export class UserService {
     return this.http.post(this.baseUrl, data);
   }
 
+  updateUser(body: any) {
+    return this.http.put(this.baseUrl, body);
+  }
+
+  updateStatusUser(items: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/changeStatus`, {items});
+  }
+
 }

@@ -1,13 +1,18 @@
 <div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="login-container p-4"> <!-- Contenedor con fondo y padding -->
-        <!-- Título -->
-        <h3 class="text-center mb-3">Iniciar Sesión</h3>
+  <div class="row justify-content-center align-items-center vh-100">
+    <div class="col-md-5">
+      <div class="login-container p-5">
+        <!-- Logotipo -->
+        <div class="text-center mb-4">
+          <img src="../../assets/logo.webp" alt="CaseKeeper Logo" class="logo" style="border-radius: 60px;">
+        </div>
         
+        <!-- Título -->
+        <h3 class="text-center mb-4">Bienvenido a CaseKeeper</h3>
+
         <!-- Formulario -->
         <form [formGroup]="authForm">
-          <div class="form-group mb-3">
+          <div class="form-group mb-4">
             <label for="userName" class="form-label">Usuario</label>
             <input 
               type="text" 
@@ -16,8 +21,8 @@
               placeholder="Ingresa tu Usuario" 
               formControlName="userName">
           </div>
-          
-          <div class="form-group mb-3">
+
+          <div class="form-group mb-4">
             <label for="password" class="form-label">Contraseña</label>
             <input 
               type="password" 
@@ -26,19 +31,23 @@
               placeholder="Ingresa tu contraseña" 
               formControlName="password">
           </div>
-          
+
           <!-- Error de validación -->
-          <div *ngIf="formInvalid" class="alert alert-danger text-center mt-3">
+          <div *ngIf="formInvalid" class="alert alert-danger text-center">
             Usuario o Contraseña Incorrectos.
           </div>
-          
+
           <!-- Botón de inicio de sesión -->
-          <div class="d-grid mt-4">
+          <div class="d-grid">
             <button class="btn btn-primary btn-block" (click)="login()">Iniciar Sesión</button>
           </div>
         </form>
+
+        <!-- Pie de página
+        <div class="text-center mt-4">
+          <p class="text-muted small">¿Olvidaste tu contraseña? <a href="#" class="link-primary">Recupérala aquí</a></p>
+        </div> -->
       </div>
     </div>
   </div>
 </div>
-

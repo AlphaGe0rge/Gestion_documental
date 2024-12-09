@@ -7,3 +7,8 @@
   background-color: #495057;
   border-radius: 5px;
 }
+
+.logo {
+  max-width: 120px;
+  border-radius: 60px;
+}

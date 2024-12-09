@@ -3,6 +3,7 @@ import { AuthService } from '../services/auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PasswordValidatorService } from '../validators/password-validator.service';
 import { NotificationsService } from '../services/notifications.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-user-settings',
@@ -17,6 +18,7 @@ export class UserSettingsComponent implements OnInit {
               private fb: FormBuilder,
               private notificationsService: NotificationsService,
               private passwordValidator: PasswordValidatorService,
+              private userService: UserService
 
   ) {
 
@@ -57,7 +59,23 @@ export class UserSettingsComponent implements OnInit {
       return;
     }
 
-    console.log(this.passwordForm.value);
+    const body = {
+      password: this.passwordForm.get('newPassword')?.value,
+      userId: this.authService.usuario.userId
+    }; 
+
+    this.userService.updateUser(body).subscribe({
+      next: (value) => {
+          this.notificationsService.success('Contraseña actualizada');
+          this.passwordForm.reset();
+      },
+      error: (err) => {
+        this.notificationsService.error('Erro al actualizar la contraseña');
+        console.log(err);
+      },
+    })
+
+
   }
 
 

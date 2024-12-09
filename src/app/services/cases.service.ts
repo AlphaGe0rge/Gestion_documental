@@ -15,16 +15,16 @@ export class CasesService {
     return this.http.post(`${this.baseUrl}/casesGet`, where);
   }
 
-  getCaseById(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/${id}`);
-  }
-
   createCase(data: any): Observable<any> {
     return this.http.post(this.baseUrl, data);
   }
 
   updateCase(id: number, data: any): Observable<any> {
     return this.http.put(`${this.baseUrl}/${id}`, data);
+  }
+
+  updateStatusCase(items: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}`, {items});
   }
 
   deleteCase(id: any): Observable<any> {

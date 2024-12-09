@@ -7,6 +7,7 @@ import { saveAs } from 'file-saver'; // Importar correctamente la librería
 import { NotificationsService } from '../services/notifications.service';
 import { ModalComponent } from '../widgets/modal/modal.component';
 import { UserService } from '../services/user.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-documents',
@@ -34,7 +35,7 @@ export class DocumentsComponent implements OnInit {
 
   filters: any = {
     title: "",
-    status: null,
+    status: true,
     dateFrom: null,
     dateTo: null,
     lawyerName: null
@@ -57,14 +58,16 @@ export class DocumentsComponent implements OnInit {
     }
   ]
 
-
   @ViewChild('confirmModal', {static: false}) confirmModal!: ModalComponent; 
   @ViewChild('fileUploadModal', {static: false}) fileUploadModal!: ModalComponent; 
+
+  usuario: any;
 
   constructor(
     private documentService: DocumentsService,
     private casesService: CasesService,
     private fb: FormBuilder,
+    private authService: AuthService,
     private notificationService: NotificationsService,
     private userService: UserService
   ) {
@@ -78,6 +81,8 @@ export class DocumentsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.usuario = this.authService.usuario
     
     const today = new Date();
     const todayFormatted = today.toISOString().split('T')[0];
@@ -110,7 +115,14 @@ export class DocumentsComponent implements OnInit {
     }
 
     if (typeof this.filters.status === "boolean") where.status = this.filters.status;
-    if (this.selectedLawyerId) where.userId = this.selectedLawyerId;
+
+    if (this.selectedLawyerId) {
+      where.userId = this.selectedLawyerId;
+    }
+    else {
+      where.userId = this.authService.usuario.userId
+    }
+
     
     this.casesService.getAllCases(where).subscribe(
       (data) => this.cases = data,

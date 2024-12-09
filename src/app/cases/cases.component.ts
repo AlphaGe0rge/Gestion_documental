@@ -54,6 +54,8 @@ export class CasesComponent implements OnInit {
     }
   ]
 
+  usuario: any;
+
   constructor(private caseService: CasesService, 
               private fb: FormBuilder,
               private authService: AuthService,
@@ -70,6 +72,8 @@ export class CasesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.usuario = this.authService.usuario
     
     const today = new Date();
     const todayFormatted = today.toISOString().split('T')[0];
@@ -90,7 +94,7 @@ export class CasesComponent implements OnInit {
       { name: 'Titulo', field: 'title', editable: false, show: true },
       { name: 'Descripción', field: 'description', editable: false, show: true},
       { name: 'Fecha de creación', field: 'createdAt', editable: false, show: true, type: "date", width: '180px' },
-      { name: 'Estado', field: 'status', editable: false, show: false, width: '140px' }
+      { name: 'Estado', field: 'status', editable: false, show: true, width: '120px' }
     ]
 
     this.loadCases();
@@ -115,7 +119,13 @@ export class CasesComponent implements OnInit {
     }
 
     if (typeof this.filters.status === "boolean") where.status = this.filters.status;
-    if (this.selectedLawyerId) where.userId = this.selectedLawyerId;
+
+    if (this.selectedLawyerId) {
+      where.userId = this.selectedLawyerId;
+    }
+    else {
+      where.userId = this.authService.usuario.userId
+    }
 
     this.caseService.getAllCases(where).subscribe(
       (data) => {
@@ -252,7 +262,31 @@ export class CasesComponent implements OnInit {
   }
 
   changeStatus() {
-    console.log(this.dataGrid.selectedRows());
+
+    const items = this.dataGrid.selectedRows();
+
+    if (!items.length) {
+      this.notificationService.warning('No hay casos seleccionados');
+      return;
+    }
+
+    const updateItems = items.map(o => {
+      return {
+        caseId: o.caseId,
+        status: o.status
+      }
+    });
+
+    this.caseService.updateStatusCase(updateItems).subscribe({
+      next: (value) => {
+          this.notificationService.success('Estado actualizado');
+          this.loadCases();
+      },
+      error: (err) => {
+        this.notificationService.error('Error al actualizar');
+      },
+    })
+
   }
 
 }

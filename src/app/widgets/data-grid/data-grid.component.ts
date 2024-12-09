@@ -99,7 +99,7 @@ export class DataGridComponent implements OnInit {
       this.selectRowEvent.emit(row);
     }
     else {
-      row.selected = false;
+      row.selected = selected;      
       this.selectRowEvent.emit(row);
     }
 

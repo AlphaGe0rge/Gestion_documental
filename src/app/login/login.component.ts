@@ -50,8 +50,6 @@ export class LoginComponent implements OnInit {
       this.formInvalid = true
     }
 
-    this.router.navigate(['/dashboard/cases']);
-
   }
 
 

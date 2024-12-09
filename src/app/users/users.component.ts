@@ -16,13 +16,13 @@ export class UsersComponent implements OnInit {
  @ViewChild('userModal', { static: false }) userModal!: ModalComponent;
 
   filters = {
-    roleId: 'student',
+    roleId: 'lawyer',
     nombre: '',
     usuario: '',
     correo: '',
     phoneNumber: '',
     gradeId: '',
-    status: null
+    status: true
   };
 
   status = [
@@ -89,7 +89,8 @@ export class UsersComponent implements OnInit {
     this.gridColumns = [
       { name: 'Nombre', field: 'fullName', editable: false, show: true },
       { name: 'Usuario', field: 'userName', editable: false, show: true},
-      { name: 'Rol', field: 'role', editable: false, show: true },
+      { name: 'Rol', field: 'role', editable: false, show: true, width: '120px' },
+      { name: 'Estado', field: 'status', editable: false, show: true, width: '120px' },
     ]
 
   }
@@ -101,10 +102,19 @@ export class UsersComponent implements OnInit {
     if (this.filters.nombre) where.fullName = this.filters.nombre;
     if (this.filters.usuario) where.userName = this.filters.usuario;
     if (this.filters.roleId) where.role = this.filters.roleId;
-    if (this.filters.status) where.status = this.filters.status;
+    if (typeof this.filters.status === 'boolean') where.status = this.filters.status;
 
     this.userService.getAllUsers(where).subscribe({
       next: (data) => {
+
+        for (const o of data) {
+          if (o.status) {
+            o.status = 'activo'
+          }
+          else {
+            o.status = 'inactivo'
+          }
+        }
           this.filteredData = data;
           this.changeDetectorRef.detectChanges();
           this.dataGrid.paginateData();
@@ -168,6 +178,34 @@ export class UsersComponent implements OnInit {
     else{
       return ''
     }
+
+  }
+
+  changeStatus() {
+
+    const items = this.dataGrid.selectedRows();
+
+    if (!items.length) {
+      this.notificationService.warning('No hay usuarios seleccionados');
+      return;
+    }
+
+    const updateItems = items.map(o => {
+      return {
+        userId: o.userId,
+        status: o.status
+      }
+    });
+
+    this.userService.updateStatusUser(updateItems).subscribe({
+      next: (value) => {
+          this.notificationService.success('Usuario actualizado');
+          this.getDataGrid();
+      },
+      error: (err) => {
+        this.notificationService.error('Error al actualizar');
+      },
+    })
 
   }
 

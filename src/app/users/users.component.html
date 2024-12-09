@@ -6,6 +6,8 @@
     <button type="button" class="btn btn-primary" (click)="openUserModal()">
         <i class="bi bi-plus-circle"></i> Agregar
     </button>
+    <button class="btn btn-secondary" (click)="changeStatus()">Cambiar Estado</button>
+
 </div>
 
 <!-- Filtros -->
@@ -46,7 +48,7 @@
         <div class="col-md-3">
           <label for="status" class="form-label">Status</label>
           <select id="status" class="form-control" [(ngModel)]="filters.status" name="status">
-            <option *ngFor="let statu of status" [value]="statu.value">{{statu.name}}</option>
+            <option *ngFor="let statu of status" [ngValue]="statu.value">{{statu.name}}</option>
           </select>
         </div>
   
@@ -58,6 +60,8 @@
     <app-data-grid #dataGrid
                    [columns]="gridColumns"
                    [data]="filteredData"
+                   [selectMulti]="true"
+                   [showSelector]="true"
     ></app-data-grid>
 </div>
   
