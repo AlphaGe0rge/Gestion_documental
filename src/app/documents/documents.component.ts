@@ -154,22 +154,18 @@ export class DocumentsComponent implements OnInit {
 
   }
 
-  async handleCollapseClick(item: any, event:any){
-
+  async handleCollapseClick(item: any, event: any) {
     this.currentFolders = [];
-
-    const target = event.target as HTMLElement;
-    const isExpanding = target.getAttribute('aria-expanded') === 'true'; // Chequea si está expandido o no
   
-    // Aquí estamos revisando si el acordeón se expande o colapsa
-    if (isExpanding) {
+    // Cambiar el estado de `isOpen` antes de ejecutar la lógica
+    item.isOpen = !item.isOpen;
+  
+    // Si se está abriendo, cargar las carpetas; si no, limpiar la lista
+    if (item.isOpen) {
       await this.loadRootFolder(item.caseId);
     } else {
       this.currentFolders = [];
     }
-
-    item.isOpen = !item.isOpen;
-
   }
 
   createFolder(): void {
